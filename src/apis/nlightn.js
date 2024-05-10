@@ -382,26 +382,102 @@ export const pythonApp = async (appName) =>{
 
 
 
-// upload files to s3
-export const uploadFiles = async (filePath,attachments)=>{
-  console.log("filepath",filePath)
+//Upload files to AWS S3
+export const uploadFiles = async (folder, attachments)=>{
+
+  console.log("folder", folder)
   console.log("attachments",attachments)
-
-  let updatedAttachments = attachments
-  await Promise.all(attachments.map(async (item) => {
-    console.log(item)
-    let file = item.data;
-    console.log(file)
-
-    const url = await fileServer.uploadFile(filePath,file)
   
-    let updatedFile = {...file, ...{["url"]: url}};
-    delete updatedFile.data
-    updatedAttachments.push(updatedFile)
+  let updatedAttachments = []
 
-  }));
-   
-  console.log(updatedAttachments)
-  return updatedAttachments
-};
+  try {
+      await Promise.all(attachments.map(async (file) => {
+
+        const filePath = `secure_file_transfer/${folder}/${file.name}` 
+        
+          const getUrl = await serverConnection.post(`/aws/getS3FolderUrl`, {filePath: filePath});
+          const url = await getUrl.data;
+          const fileUrl = await url.split("?")[0];
+
+          await fetch(url, {
+              method: "PUT",
+              headers: {
+                  "Content-Type": file.type,
+              },
+              body: file.data
+          });
+
+          let updatedFile = {...file, ...{["url"]: fileUrl}};
+          delete updatedFile.data
+          updatedAttachments.push(updatedFile)
+      }));
+
+      return updatedAttachments
+
+     } catch (error) {
+        console.error("Error uploading file:", error);
+    }
+
+}
+
+
+export const getFiles = async (folderPath)=>{
+
+  const params = {
+    bucketName: "nlightnlabs01",
+    path: `secure_file_transfer/${folderPath}`
+  }
+
+  try {
+      const response = await serverConnection.post(`/aws/getFiles`, params);
+      const data = await response.data;
+      let files = []
+      data.forEach(item => {
+        const key = item.file.Key
+        const fileName = key.split('/').pop(); // Get the file name
+        const fileType = fileName.split('.').pop(); // Get the file type
+        if (fileName.length>0){
+            files.push({
+            name: fileName, 
+            type: fileType, 
+            size: formatValue.formatFileSize(item.file.Size), 
+            last_modified: formatValue.UTCToLocalDateTime(item.file.LastModified), 
+            owner: item.file.Owner.DisplayName, 
+            url: item.url.split("?")[0],
+            key: key, 
+            file_data: item.file_data,
+            meta_data: item.meta_data
+          })
+        }
+      });
+
+      return files
+  } catch (error) {
+      console.error("Error uploading file:", error);
+  }
+}
+
+
+
+export const deleteFiles = async (files)=>{
+
+  let status = "OK"
+  try{
+    await Promise.all(files.map(async (item) => {
+      const params = {
+        Bucket: "nlightnlabs01",
+        Key: item.key,
+      }
+        const response = await serverConnection.post('/aws/deleteFile', params);
+        if(response.statusText !="OK"){
+          status = response.statusText
+        }
+    }));
+    return status
+  }catch(error){
+    console.error("Error deleting file:", error);
+    return error
+  }
+}
+
 
