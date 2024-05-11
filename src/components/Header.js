@@ -1,8 +1,7 @@
-import React,{useState, useRef} from 'react'
+import React,{useState} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { setUser, setUserLoggedIn } from '../redux/slices/authSlice'
 import { setCurrentPage } from '../redux/slices/navSlice'
-import { setAppData } from '../redux/slices/appDataSlice'
 import { clearAllStorage } from '../redux/store'; // Import from centralized utility file
 import * as iconsApi from "../apis/icons.js"
 
@@ -19,7 +18,6 @@ const Header = (props) => {
   
   //Set Local States
   const [showUserMenu, setShowUserMenu] = useState(false)
-  const headerRef = useRef()
   
   const HeaderStyle = {
     position: "relative",
@@ -46,7 +44,7 @@ const Header = (props) => {
   
 
   return (
-    <div useRef = {headerRef} className="d-flex w-100 justify-content-between" style={HeaderStyle}>
+    <div className="d-flex w-100 justify-content-between" style={HeaderStyle}>
         
         <div className="d-flex w-50 ms-3 align-items-center">
             <img src={`${iconsApi.generalIcons}/${logo}`} style={{height: "50px"}} />

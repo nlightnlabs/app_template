@@ -3,7 +3,6 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import { useSelector, useDispatch } from 'react-redux'
 import { setUser, setUserLoggedIn } from '../../../redux/slices/authSlice'
 import { setCurrentPage } from '../../../redux/slices/navSlice'
-import { setAppData } from '../../../redux/slices/appDataSlice'
 import * as iconsApi from "../../../apis/icons"
 import * as nlightnApi from "../../../apis/nlightn"
 import MultiInput from "../../../components/MultiInput"
@@ -14,10 +13,6 @@ const SignIn = () => {
 
     const [logInErrorMsg, setLogInErrorMsg] = useState("")
     const [logInClassName, setLogInClassName] = useState("d-none")
-
-    useEffect(()=>{
-        dispatch(setCurrentPage("SignIn"))
-    })
 
     const [formData, setFormData] = useState({
         email: "",
@@ -65,7 +60,6 @@ const SignIn = () => {
     const userValidated = await validateUser()
     if(userValidated){  
         const user_data = await getUserInfo()
-        setUser(user_data)
         dispatch(setUser(user_data))
         dispatch(setUserLoggedIn(true))
         dispatch(setCurrentPage("Home"))     
@@ -93,7 +87,6 @@ const SignIn = () => {
 
             <h3 style={{color: "rgb(0,100,225)"}}>Sign in</h3>
 
-            
             <div className="d-flex bg-light w-100 flex-column p-3 mt-1 shadow rounded-3" >
                     <MultiInput
                         id="email"
@@ -102,7 +95,7 @@ const SignIn = () => {
                         onChange = {(e)=>handleChange(e)}
                         label="Email"
                     />
-
+                   
                     <MultiInput
                         id="pwd"
                         name="pwd"
@@ -111,6 +104,8 @@ const SignIn = () => {
                         label="Password"
                         type="password"
                     />
+
+                    <div className={logInClassName}>{logInErrorMsg}</div>
    
                 <div className="d-flex flex-column w-100 mt-3">
                     <div className="d-flex justify-content-center w-100">

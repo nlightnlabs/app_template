@@ -4,9 +4,7 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 
 import { useSelector, useDispatch } from 'react-redux'
-import { setUser, setUserLoggedIn } from '../redux/slices/authSlice'
 import { setCurrentPage, setPageList } from '../redux/slices/navSlice'
-
 
 
 const Menu = (props) =>{
@@ -67,7 +65,6 @@ const Menu = (props) =>{
     const [labelHoverColor, setLabelHoverColor] = useState("gray")
 
     const getThemeColors = ()=>{
-        console.log("colorTheme",colorTheme)
         setMenuColor(colorThemes.find(i=>i.name===colorTheme).menuColor)
         setIconColor(colorThemes.find(i=>i.name===colorTheme).iconColor)
         setLabelColor(colorThemes.find(i=>i.name===colorTheme).labelColor)
@@ -165,7 +162,7 @@ const Menu = (props) =>{
                                 ...{["color"]:hoveredItem ===item.name? hoverColor: labelColor}
                             }}
                             key={item.id}
-                            onClick={(e)=>dispatch(setCurrentPage(item.link))}
+                            onClick={(e)=>dispatch(setCurrentPage(item.name))}
                             onMouseOver = {(e)=>hover(e, item.name)}
                             onMouseLeave = {(e)=>setHoveredItem(null)}
                         >
@@ -173,14 +170,14 @@ const Menu = (props) =>{
                                 ref={menuItemIconRefs[index]}
                                 id={`${item.name}_icon`}
                                 style = {MenuIconStyle}
-                                name={item.name}
+                                name={item.icon}
                                 iconName={item.icon}
                                 fillColor={hoveredItem === item.name ? iconHoverColor : iconColor}
                                 fillOpacity={MenuIconStyle.opacity}
                                 height = "30px"
                                 width = "30px"
                                 hoveredItem = {hoveredItem}
-                                onClick={(e, item) => dispatch(setCurrentPage(item.link))}
+                                onClick={(e, item) => dispatch(setCurrentPage(item.name))}
                             />
       
                             {isExpanded && 
@@ -192,7 +189,7 @@ const Menu = (props) =>{
                                     style={{...MenuItemLabelStyle,
                                         ...{["color"]:hoveredItem ===item.name? labelHoverColor: labelColor}
                                     }}
-                                    onClick={(e)=>dispatch(setCurrentPage(item.link))}
+                                    onClick={(e)=>dispatch(setCurrentPage(item.name))}
                                 >
                                     {item.label} 
                                </div>

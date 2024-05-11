@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useSelector, useDispatch } from 'react-redux';
 import { setUser, setUserLoggedIn } from './redux/slices/authSlice';
 import { setCurrentPage, setPageList } from './redux/slices/navSlice';
-import { setAppData } from './redux/slices/appDataSlice';
+
 
 import Home from "./Home";
 import Header from "./components/Header";
@@ -14,11 +14,6 @@ import ResetPassword from "./modules/authentication/pages/ResetPassword";
 import Profile from "./modules/account/pages/Profile";
 import Settings from "./modules/account/pages/Settings";
 
-import { current } from '@reduxjs/toolkit';
-
-function PageComponent({ Page }) {
-  return Page ? <Page /> : null;
-}
 
 function App() {
 
@@ -33,7 +28,6 @@ function App() {
   const user = useSelector(state => state.authentication.user);
   const userLoggedIn = useSelector(state => state.authentication.userLoggedIn);
   const currentPage = useSelector(state => state.navigation.currentPage);
-  const appData = useSelector(state => state.navigation.appData);
   
   const dispatch = useDispatch();
  
@@ -41,44 +35,32 @@ function App() {
   // local states
   const [pages, setPages] = useState([])
   const [menuItems, setMenuItems] = useState([])
-  const containerRef = useRef()
 
   // Setup data
   const pageData = [
- 
-    { id: 1, name: "SignIn", label: "Sign In", component: <SignIn/> },
-    { id: 2, name: "SignUp", label: "Sign Up",component: <SignUp /> },
-    { id: 3, name: "ResetPassword", label: "Reset Password",component: <ResetPassword/> },
-    { id: 4, name: "Home", label: "Home", component: <Home/> },
-    { id: 5, name: "Profile", label: "Profile", component: <Profile/> },
-    { id: 6, name: "Settings", label: "Settings", component: <Settings/> },
+    { id: 1, section: 0, name: "SignIn", label: "Sign In", Icon: "",component: <SignIn/>, showOnMenu: false },
+    { id: 2, section: 0, name: "SignUp", label: "Sign Up",Icon: "", component: <SignUp />, showOnMenu: false},
+    { id: 3, section: 0, name: "ResetPassword", label: "Reset Password", Icon: "",component: <ResetPassword/>, showOnMenu: false},
+    { id: 4, section: 1, name: "Home", label: "Home", icon: "HomeIcon", component: <Home/>, showOnMenu: true},
+    { id: 5, section: 1, name: "Profile", label: "Profile", icon: "ProfileIcon", component: <Profile/>, showOnMenu: true},
+    { id: 6, section: 1, name: "Settings", label: "Settings",icon: "SettingsIcon", component: <Settings/>, showOnMenu: true}
   ];
-
-  const menuItemsData = [
-    {id: 1, section: 1, name: "home", label: "Home", icon: "HomeIcon", link: "Home"},
-    {id: 2, section: 1, name: "profile", label: "Profile", icon: "ProfileIcon", link: "Profile"},
-    {id: 3, section: 1, name: "settings", label: "Settings", icon: "SettingsIcon", link: "Settings"},
-    {id: 4, section: 2, name: "module1", label: "Module 1", icon: "AppIcon", link: "Home"},
-    {id: 5, section: 2, name: "module2", label: "Module 2", icon: "AppIcon", link: "Home"},
-    {id: 6, section: 2, name: "module3", label: "Module 3", icon: "AppIcon", link: "Home"}
-  ]
-
-  const getPages = async () => {
-    setPages(pageData)
-  };
 
   
   const getMenuItems = async ()=>{
-    setMenuItems(menuItemsData)
+    let menuItems = []
+    pageData.map(item=>{
+      if(item.showOnMenu){
+        delete item.component
+        menuItems.push(item)
+      }})
+    setMenuItems(menuItems)
   }
 
 
   useEffect(() => {
-    console.log(currentPage)
-    getPages();
     getMenuItems()
   }, []);
-
 
 
   return (
@@ -94,7 +76,7 @@ function App() {
             <SignIn/>
           :
             <div className="d-flex w-100 justify-content-between" style={{height:"100%"}}>
-                {pages.length>0  && pages.find(i=>i.name ===currentPage).component}
+                {pageData.length>0  && (pageData.find(i=>i.name ===currentPage).component)}
                 {menuItems.length>0 && <Menu menuItems={menuItems} colorTheme="nlightn blue"/> }
             </div>
           }

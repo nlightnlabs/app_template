@@ -10,7 +10,6 @@ const Home = () => {
   const pageList = useSelector(state=>state.navigation.pageList)
 
   useEffect(()=>{
-    dispatch(setCurrentPage("Home"))
     dispatch(setPageList([...pageList,"Home"]))
   },[])
 

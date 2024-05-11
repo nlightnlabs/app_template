@@ -1,5 +1,5 @@
 import axios from "axios";
-import * as fileServer from "./fileServer"
+import {formatValue} from "../functions/formatValue"
 
 export const baseURL = process.env.NODE_ENV==="production" ? "https://nlightnlabs.net" : "http://localhost:3001"
 
@@ -382,6 +382,8 @@ export const pythonApp = async (appName) =>{
 
 
 
+
+
 //Upload files to AWS S3
 export const uploadFiles = async (folder, attachments)=>{
 
@@ -479,5 +481,3 @@ export const deleteFiles = async (files)=>{
     return error
   }
 }
-
-
